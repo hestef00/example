@@ -1,0 +1,276 @@
+
+
+    <!-- CLASS IDS PANEL -->
+    <div ng-include src="'views/identifiers.html'"></div>
+
+	<!-- Domains -->
+    <div ng-include src="'views/innerDomains.html'"></div>
+
+	<!-- CLASS PARENT PANEL -->
+	<div class="panel panel-default" ng-controller="InnerClassController as IClassCtrl">
+
+        <div class="panel-heading">
+            <img src="./ids/clases.png" alt="Vebor classes" style="width:30px;height:30px;" class="img-thumbnail">
+            {{ translation.attributes.parents }}
+
+            <span uib-popover="{{ translation.help.class.parent }}" style="cursor: help;" popover-title="Info" type="button" class="glyphicon glyphicon-info-sign pull-right" popover-placement="bottom"></span>
+        </div>
+
+        <div class="panel-body">
+			<!-- Selecting parent -->
+			<div class="form-group" ng-controller="SearchClasses as SClasses">
+				<div class="col-sm-12">
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="{{ translation.buttons.search }}" ng-model="SClasses.searchText._id" ng-click="SClasses.desplegar = true" ng-blur="SClasses.desplegar = false">
+						<span class="input-group-addon btn btn-default glyphicon glyphicon-search btn-search-glyphicon"></span>
+					</div>
+
+					<div class="panel panel-default" ng-model="results" ng-show="SClasses.desplegar">
+						<ul class="list-group">
+							<li class="list-group-item cursor-pointer" ng-class="hover ? 'active':''" ng-repeat="item in filteredClasses = (SClasses.classes | filter:{ids : SClasses.searchText._id }:strict) | limitTo:5" ng-mouseover="hover = true" ng-mouseleave="hover = false" ng-mousedown="IClassCtrl.saveClass(item)" ng-if="item._id !== selectedItem._id">
+                                <span ng-repeat="itemId in item.ids">
+                                    {{ itemId }}
+                                </span>
+                                <span class="glyphicon glyphicon-ok pull-right" style="color: white;"></span>
+                            </li>
+							<li class="list-group-item" ng-hide="filteredClasses.length">{{ translation.messages.no_results }}</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+			   <div class="col-sm-12">
+					<ul class="list-group">
+						<li class="list-group-item class" ng-repeat="parent in IClassCtrl.classes">
+                            <span ng-repeat="parentId in parent.ids">
+                                {{parentId}}
+                            </span>
+
+                            <div class="button-group pull-right">
+                                <button  type="button" class="btn btn-xs btn-warning glyphicon glyphicon glyphicon-star" ng-if="$index===0" title="{{translation.titles.primary_parent}}"></button>
+								<!--<button type="button" class="btn btn-xs glyphicon glyphicon-chevron-down" ng-click="IClassCtrl.moveDownClass($index)" title="{{translation.titles.down}}"></button>
+								<button type="button" class="btn btn-xs glyphicon glyphicon-chevron-up" ng-click="IClassCtrl.moveUpClass($index)" title="{{translation.titles.up}}"></button>-->
+								<button type="button" class="btn btn-xs btn-danger glyphicon glyphicon-trash" ng-click="IClassCtrl.removeClass($index)" title="{{translation.titles.remove}}"></button>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <!-- CLASS FEATURES PANEL -->
+    <div class="panel panel-default" ng-controller="InnerFeatureController as IFeatureCtrl">
+        <div class="panel-heading">
+            <img src="./ids/caracteristicas.png" alt="Vebor features" style="width:30px;height:30px;" class="img-thumbnail">
+            {{ translation.Features }}
+            <span uib-popover="{{ translation.help.class.features }}" style="cursor: help;" popover-title="Info" type="button" class="glyphicon glyphicon-info-sign pull-right" popover-placement="bottom"></span>
+        </div>
+        <div class="panel-body">
+            <!-- Selecting feature -->
+            <div class="form-group form-horizontal" ng-controller="SearchFeatures as SFeatures" ng-init="SFeatures.search()">
+                <div class="col-sm-12">
+                    <div class="input-group">
+                        <select class="form-control" ng-model="type" ng-change="SFeatures.search()">
+                            <option value="">{{ translation.buttons.select_feature_type}}</option>
+                            <option ng-repeat="type in SFeatures.types" value="{{type.value}}">{{ translation[type.title] }}</option>
+                            <option value="all">{{ translation.buttons.all_feature_type }}</option>
+                        </select>
+                        <input type="text" class="form-control" placeholder="{{ translation.buttons.search }}" ng-model="SFeatures.searchText._id" ng-click="SFeatures.desplegar = true" ng-blur="SFeatures.desplegar = false">
+                        <span class="input-group-addon btn btn-default glyphicon glyphicon-search btn-search-glyphicon" onclick="SFeatures.search()"></span> <!--fullSearchInDatabase-->
+                    </div>
+                    <div class="panel panel-default" ng-model="results" ng-show="SFeatures.desplegar">
+                        <ul class="list-group">
+                            <li class="list-group-item cursor-pointer" ng-class="hover ? 'active':''" ng-repeat="item in filteredFeatures = (features | filter:{ids: SFeatures.searchText._id}:strict) | limitTo:5" ng-mouseover="hover = true" ng-mouseleave="hover = false" ng-mousedown="IFeatureCtrl.saveFeature(item)" >
+                                <span ng-repeat="featuresId in item.ids">
+                                    {{ featuresId }}
+                                </span>
+
+                                <span class="glyphicon glyphicon-ok pull-right" style="color: white;"></span>
+
+                            </li>
+                            <li class="list-group-item" ng-hide="filteredFeatures.length">{{ translation.messages.no_results }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+               <div class="col-sm-12">
+                    <ul class="list-group">
+                        <li class="list-group-item {{ feature.feature_type }}" ng-repeat="feature in IFeatureCtrl.features" ng-init="featurePosition = $index;  IFeatureCtrl.names[featurePosition] = feature.ids">
+                            <div>
+                                <img ng-if="feature.feature_type==='class'" src="./ids/clases.png" alt="Vebor classes" style="width:15px;height:15px;">
+                                <img ng-if="feature.feature_type==='feature_container'" src="./ids/contenedor.png" alt="Vebor classes" style="width:17px;height:17px;">
+                                <img ng-if="feature.feature_type==='feature_quantifying'" src="./ids/cuantificacion.png" alt="Vebor classes" style="width:17px;height:17px;">
+                                <img ng-if="feature.feature_type==='feature_qualifying'" src="./ids/calificacion.png" alt="Vebor classes" style="width:17px;height:17px;">
+                                <span ng-repeat="name in feature.ids">
+                                    {{ name }}
+                                </span>
+                                <div class="button-group pull-right">
+                                    <!--<button type="button" class="btn btn-xs glyphicon glyphicon-chevron-down" ng-click="IFeatureCtrl.moveDownFeature(featurePosition)" title="{{translation.titles.down}}"></button>
+                                    <button type="button" class="btn btn-xs glyphicon glyphicon-chevron-up" ng-click="IFeatureCtrl.moveUpFeature(featurePosition)" title="{{translation.titles.up}}"></button>-->
+                                    <button type="button" class="btn btn-xs glyphicon glyphicon-edit" ng-click="IFeatureCtrl.editFeature(feature, featurePosition, featurePosition)" data-toggle="collapse" data-target="#featureValueCollapse{{featurePosition}}" title="{{translation.titles.edit}}"></button>
+                                    <button type="button" class="btn btn-xs btn-danger glyphicon glyphicon-trash" ng-click="IFeatureCtrl.removeFeature(featurePosition)" title="{{translation.titles.remove}}"></button>
+                                </div>
+                            </div>
+
+                            <!-- collapse -->
+                            <div class="collapse form-inline featuresCollapse" id="featureValueCollapse{{featurePosition}}">
+                                <!-- Names -->
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        {{ translation.attributes.names }}
+                                        <span uib-popover="{{ translation.help.class.names }}" style="cursor: help;" popover-title="Info" type="button" class="glyphicon glyphicon-info-sign pull-right" popover-placement="bottom"></span>
+                                    </div>
+
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <!-- List of ids -->
+                                            <ul class="list-group">
+                                                <div class="list-group-item" ng-repeat="name in IFeatureCtrl.names[featurePosition]">
+                                                    <div ng-if="!feature['$$editBtn'+$index]" >
+                                                        <span>{{ name }}</span>
+                                                        <div class="button-group pull-right">
+                                                            <button class="btn btn-xs btn-danger glyphicon glyphicon-trash" ng-click="IFeatureCtrl.removeName($index, featurePosition)"></button>
+                                                        </div>
+                                                    </div>
+                                                    <!-- BEGIN: modify a name -->
+                                                    <div ng-if="feature['$$editBtn'+$index]">
+                                                        <ul class="list-group">
+                                                            <div class="list-group-item form-inline">
+                                                                <input type="text" class="form-control" ng-model="value" ng-change="IFeatureCtrl.names[feature._id] = value">
+
+                                                                <div class="button-group pull-right">
+                                                                    <button type="button" class="btn btn-xs btn-success glyphicon glyphicon-ok" ng-click="feature['$$editBtn'+$index] = !feature['$$editBtn'+$index]; IFeatureCtrl.editName($index, key, value)"></button>
+                                                                    <button type="button" class="btn btn-xs btn-danger glyphicon glyphicon-remove" ng-click="feature['$$editBtn'+$index] = !feature['$$editBtn'+$index];"></button>
+                                                                </div>
+                                                            </div>
+                                                        </ul>
+                                                    </div>
+                                                    <!-- END: modify a name -->
+                                                </div>
+                                            </ul>
+                                            <!-- Add a new name -->
+                                            <ul class="list-group">
+                                                <div class="list-group-item form-inline">
+                                                    <input type="text" class="form-control" ng-model="IFeatureCtrl.newVName[featurePosition]">
+                                                    <div class="button-group pull-right">
+                                                        <button type="button" class="btn btn-xs btn-success glyphicon glyphicon-ok" ng-click="IFeatureCtrl.saveName(featurePosition)"></button>
+                                                        <button type="button" class="btn btn-xs btn-danger glyphicon glyphicon-remove" ng-click="IFeatureCtrl.newKeyName=''; IFeatureCtrl.newVName=''"></button>
+                                                    </div>
+                                                </div>
+                                            </ul>
+                                         </div>
+                                    </div>
+                                    </div>
+                                </div>
+
+                                <!-- Values -->
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        {{ translation.attributes.value }}
+                                        <div class="pull-right" role="group" ng-repeat="acceptedTypes in feature.value[0]" ng-if="feature.feature_type === 'feature_container'">
+                                            <img ng-if="acceptedTypes==='class'" src="./../ids/clases.png" alt="Vebor classes" style="width:15px;height:15px;">
+                                            <img ng-if="acceptedTypes==='feature_container'" src="./../ids/contenedor.png" alt="Vebor classes" style="width:17px;height:17px;">
+                                            <img ng-if="acceptedTypes==='feature_quantifying'" src="./../ids/cuantificacion.png" alt="Vebor classes" style="width:17px;height:17px;">
+                                            <img ng-if="acceptedTypes==='feature_qualifying'" src="./../ids/calificacion.png" alt="Vebor classes" style="width:17px;height:17px;">
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <!-- CLASS TYPE -->
+                                        <div ng-if="feature.feature_type === 'class'" ng-init="indexItem = $index; IFeatureCtrl.getFeatureClassData(indexItem);">
+
+                                            <!-- Restriction: classes -->
+                                            <div>
+                                                <div class="form-group" ng-controller="SearchClasses as SClasses"> <!--SClasses -->
+                                                    <div class="col-sm-12">
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control" placeholder="Search" ng-model="SClasses.searchText._id" ng-click="SClasses.desplegar = true" ng-blur="SClasses.desplegar = false">
+                                                            <span class="input-group-addon btn btn-default glyphicon glyphicon-search btn-search-glyphicon"></span>
+                                                        </div>
+
+                                                        <div class="panel panel-default" ng-model="results" ng-show="SClasses.desplegar">
+                                                            <ul class="list-group">
+                                                                <li class="list-group-item cursor-pointer" ng-class="hover ? 'active':''" ng-repeat="item in filteredClasses = (SClasses.classes | childrenFrom: feature.feature_id) | filter:{ids : SClasses.searchText._id }:strict | limitTo:5" ng-mouseover="hover = true" ng-mouseleave="hover = false" ng-mousedown="feature.value = item._id; IFeatureCtrl.selectedClassId[indexItem] = item;" ng-if="item._id !== selectedItem._id">
+                                                                    <span ng-repeat="itemId in item.ids" >
+                                                                        {{ itemId }}
+                                                                    </span>
+                                                                    <span class="glyphicon glyphicon-ok pull-right" style="color: white;"></span>
+                                                                </li>
+                                                                <li class="list-group-item" ng-hide="filteredClasses.length">{{ translation.messages.no_results }}</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- class selected-->
+                                            <div class="form-group col-sm-6 pull-right" ng-if="IFeatureCtrl.selectedClassId[indexItem] !== undefined">
+                                               <div class="col-sm-12">
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item">
+                                                            <span ng-repeat="indId in IFeatureCtrl.selectedClassId[indexItem].ids">
+                                                                {{ indId }}
+                                                            </span>
+                                                            <div class="button-group pull-right">
+                                                                <button class="btn btn-xs btn-danger glyphicon glyphicon-trash" ng-click="IFeatureCtrl.selectedClassId[indexItem] = undefined; VClassCtrl.featuresWithValues[indexItem].value = '';"></button>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- QUANTIFYING TYPE -->
+                                        <div ng-if="feature.feature_type === 'feature_quantifying'">
+                                            <input class="form-control" ng-model="feature.value[0].min" type="number" min="{{feature.value[0].min}}" max="{{feature.value[0].max}}">
+                                            <span class="glyphicon glyphicon-chevron-left"></span>
+                                            <span> {{ translation.attributes.value }} </span>
+                                            <span class="glyphicon glyphicon-chevron-right"></span>
+                                            <input class="form-control" ng-model="feature.value[0].max" type="number" min="{{feature.value[0].min}}" max="{{feature.value[0].max}}">
+                                            <div class="pull-right">
+                                                <span>{{translation.attributes.measure_unit}}:</span>
+                                                <span ng-repeat="unitId in unitsGlobalList[feature.value[0].unit_measure]"><b>{{ unitId }}</b></span>
+                                            </div>
+                                        </div>
+                                        <!-- QUALIFYING TYPE -->
+                                        <div class="list-group" ng-if="feature.feature_type === 'feature_qualifying'">
+                                            <div class="list-group-item" ng-repeat="range in feature.value">
+                                                <span>{{range.value}}</span>
+                                                <div class="button-group pull-right">
+                                                    <button class="btn btn-xs btn-danger glyphicon glyphicon-trash" ng-click="IFeatureCtrl.removeQualifyingRange( featurePosition, $index)"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- CONTAINER TYPE -->
+                                        <div class="form-group col-sm-12" ng-if="feature.feature_type === 'feature_container'" ng-init="IFeatureCtrl.containedFeatures[$index] = feature.value[1]">
+                                            <div ng-include src="'views/innerFeaturesContainer.html'"></div>
+                                        </div>
+                                     </div>
+                                </div>
+                            </div>
+                        </li>
+                        <!-- Alerts -->
+                        <div ng-repeat="alert in IFeatureCtrl.alerts" class="alert {{ alert.type }}" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            {{ alert.msg }}
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEFINITIONS -->
+    <div ng-include src="'views/definitions.html'"></div>
+
+
+	<!-- Alerts -->
+	<div ng-repeat="alert in VClassCtrl.alerts" class="alert {{ alert.type }}" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			{{ alert.msg }}
+	</div>
+     <div ng-repeat="alert in SrchCtrl.alerts" class="alert {{ alert.type }}" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			{{ alert.msg }}
+	</div>
